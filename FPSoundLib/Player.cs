@@ -2,7 +2,7 @@
 {
 	public class Player
 	{
-		private List<SoundFile> _soundFiles = new List<SoundFile>();
+		private readonly List<SoundFile> _soundFiles = new();
 
 		public static void Init()
 		{

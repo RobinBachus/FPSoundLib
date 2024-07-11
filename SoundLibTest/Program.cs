@@ -4,7 +4,7 @@ namespace SoundLibTest
 {
 	internal class Program
 	{
-		static void Main(string[] args)
+		private static void Main()
 		{
 			Player player = new();
 			try

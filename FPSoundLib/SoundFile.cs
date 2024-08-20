@@ -1,18 +1,29 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using FPSoundLib.Utils;
 
 namespace FPSoundLib
 {
-	public abstract class SoundFile
+	public abstract class SoundFile(byte[] fileBuffer, FileType fileType)
 	{
-		protected byte[] FileBuffer;
+		public Metadata Metadata { get; } = new() { FileType = fileType };
 
-		internal SoundFile(byte[] fileBuffer)
+		protected byte[] FileBuffer = fileBuffer;
+
+		/// <summary>
+		/// Create a new SoundFile object based on the file type.
+		/// </summary>
+		/// <param name="fileBuffer"> The file buffer to create the SoundFile object from. </param>
+		/// <param name="fileType"> The file type of the file buffer. </param>
+		/// <returns> A new SoundFile object. </returns>
+		/// <exception cref="NotSupportedException"> Thrown when the file type is not known or not supported. </exception>
+		/// <exception cref="NotImplementedException"> Thrown when the file type is not yet supported. </exception>
+		public static SoundFile Create(byte[] fileBuffer, FileType fileType)
 		{
-			FileBuffer = fileBuffer;
+			return fileType switch
+			{
+				FileType.Wav => new WavFile(fileBuffer),
+				FileType.Unknown => throw new NotSupportedException("File type not known"),
+				_ => throw new NotImplementedException($"File type '{fileType.ToString().ToLower()}' not yet supported.")
+			};
 		}
 	}
 }

@@ -1,11 +1,13 @@
 ﻿using System.Text;
+using FPSoundLib.Utils;
 
 namespace FPSoundLib
 {
-	public class WavFile(byte[] fileBuffer): SoundFile(fileBuffer)
+	public class WavFile(byte[] fileBuffer): SoundFile(fileBuffer, FileType.Wav)
 	{
+
 		// 1-4: Marks the file as a riff file. Characters are each 1 byte long.
-		public string ChunkID { get; } = Encoding.ASCII.GetString(fileBuffer, 0, 4);
+		public string ChunkId { get; } = Encoding.ASCII.GetString(fileBuffer, 0, 4);
 
 		// 5-8: Size of the overall file - 8 bytes, in bytes (32-bit integer).
 		public int ChunkSize { get; } = BitConverter.ToInt32(fileBuffer, 4);
@@ -45,7 +47,7 @@ namespace FPSoundLib
 
 		public override string ToString()
 		{
-			return $"ChunkID: {ChunkID}\n" +
+			return $"ChunkID: {ChunkId}\n" +
 				$"ChunkSize: {ChunkSize}\n" +
 				$"Format: {Format}\n" +
 				$"FormatMarker: {FormatMarker}\n" +

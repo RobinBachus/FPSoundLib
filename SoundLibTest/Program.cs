@@ -9,12 +9,17 @@ namespace SoundLibTest
 			Player player = new();
 			try
 			{
-				WavFile wavFile = player.LoadWavFile(Path.GetFullPath("tone.wav"));
-				Console.WriteLine(wavFile);
+				Player.Init();
+				if (player.LoadFromFile(Path.GetFullPath("tone.wav")) is WavFile wavFile)
+					Console.WriteLine(wavFile);
 			}
-			catch (FileNotFoundException)
+			catch (NotImplementedException e)
 			{
-				Console.WriteLine("File not found.");
+				Console.WriteLine(e.Message);
+			}
+			catch (NotSupportedException e)
+			{
+				Console.WriteLine(e.Message);
 			}
 		}
 	}

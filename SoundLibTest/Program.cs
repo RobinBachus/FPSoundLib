@@ -9,7 +9,6 @@ namespace SoundLibTest
 			Player player = new();
 			try
 			{
-				Player.Init();
 				if (player.LoadFromFile(Path.GetFullPath("tone.wav")) is WavFile wavFile)
 					Console.WriteLine(wavFile);
 			}
@@ -20,6 +19,10 @@ namespace SoundLibTest
 			catch (NotSupportedException e)
 			{
 				Console.WriteLine(e.Message);
+			}
+			finally
+			{
+				player.Dispose();
 			}
 		}
 	}

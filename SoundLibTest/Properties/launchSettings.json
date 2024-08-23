@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "SoundLibTest": {
+      "commandName": "Project",
+      "nativeDebugging": true
+    }
+  }
+}

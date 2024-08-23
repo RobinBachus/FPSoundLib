@@ -7,36 +7,16 @@ namespace FPSoundLib
 	{
 		private readonly List<SoundFile> _soundFiles = new();
 
-		public static void Init()
+		public Player()
 		{
-			Console.WriteLine("Loading fpsl");
-			// Console.WriteLine(wasapi_wrapper.test() );
+			Console.WriteLine("Loading fpsl...");
+			Console.WriteLine("Loading WASAPI... \n");
+			int hr = wasapi_wrapper.init();
 
-			DLinkList<int> list = new()
-			{
-				1,
-				2,
-				3
-			};
+			if (hr != 0) 
+				throw new  OperationCanceledException("Failed to initialize WASAPI, init cancelled");
 
-			foreach (var node in list)
-			{
-				Console.WriteLine(node.Data);
-			}
-
-			Console.WriteLine("\nAdding 4, 5, 6\n");
-
-			// BUG: Original list when setting first element
-			
-			list[0] = new Node<int>(4);
-			list[1] = new Node<int>(5);
-			list[2] = new Node<int>(6);
-
-			foreach (var node in list)
-			{
-				Console.WriteLine(node.Data);
-			}
-
+			Console.WriteLine("\nWASAPI loaded successfully.");
 		}
 
 		public SoundFile LoadFromFile(string path)
@@ -55,5 +35,15 @@ namespace FPSoundLib
 
 		}
 
+
+		~Player()
+		{
+			wasapi_wrapper.dispose();
+		}
+
+		public void Dispose()
+		{
+			wasapi_wrapper.dispose();
+		}
 	}
 }

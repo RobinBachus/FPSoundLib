@@ -144,7 +144,26 @@ namespace FPSoundLib.Utils.DLinkList
 			{
 				var node = value.AddBeforeNode(this[index]);
 				node.Next!.Remove();
+
+				if (index == 0)
+					First = node;
+				else if (index == Count - 1)
+					Last = node;
 			}
+		}
+
+		/// <summary>
+		/// Sets the data value of a node at a specific index.
+		/// </summary>
+		///	<param name="index">The index of the node to set the data value of.</param>
+		/// <param name="value">The new data value to set.</param>
+		/// <returns>The old value of the node.</returns>
+		public T SetNode(int index, T value)
+		{
+			T oldValue = this[index].Data;
+			this[index].Data = value;
+
+			return oldValue;
 		}
 	}
 }

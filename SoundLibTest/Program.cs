@@ -6,23 +6,17 @@ namespace SoundLibTest
 	{
 		private static void Main()
 		{
-			Player player = new();
 			try
 			{
-				if (player.LoadFromFile(Path.GetFullPath("tone.wav")) is WavFile wavFile)
+				Player player = new();
+				if (player.LoadFromFile("tone.wav") is WavFile wavFile)
 					Console.WriteLine(wavFile);
 			}
-			catch (NotImplementedException e)
+			catch (Exception e) when (e is NotSupportedException or FormatException or OperationCanceledException)
 			{
-				Console.WriteLine(e.Message);
-			}
-			catch (NotSupportedException e)
-			{
-				Console.WriteLine(e.Message);
-			}
-			finally
-			{
-				player.Dispose();
+				Console.ForegroundColor = ConsoleColor.Red;
+				Console.WriteLine($"\n{e.GetType()}: {e.Message} (0x{e.HResult:X})");
+				Console.ResetColor();
 			}
 		}
 	}

@@ -11,16 +11,18 @@ namespace FPSoundLib
 		{
 			Console.WriteLine("Loading fpsl...");
 			Console.WriteLine("Loading WASAPI... \n");
-			int hr = wasapi_wrapper.init();
+			int hr = wasapi_wrapper.init(true);
 
 			if (hr != 0) 
-				throw new  OperationCanceledException("Failed to initialize WASAPI, init cancelled");
+				throw new OperationCanceledException("Failed to initialize WASAPI, init cancelled") {HResult = hr};
 
 			Console.WriteLine("\nWASAPI loaded successfully.");
 		}
 
 		public SoundFile LoadFromFile(string path)
 		{
+			path = Path.GetFullPath(path);
+
 			string ext = new FileInfo(path).Extension.Remove(0, 1);
 
 			_ = Enum.TryParse(ext, true, out FileType fileType);
@@ -34,16 +36,10 @@ namespace FPSoundLib
 			return _soundFiles.Last();
 
 		}
+		
+		public void Dispose() => wasapi_wrapper.dispose();
 
-
-		~Player()
-		{
-			wasapi_wrapper.dispose();
-		}
-
-		public void Dispose()
-		{
-			wasapi_wrapper.dispose();
-		}
+		~Player() => Dispose();
+		
 	}
 }

@@ -21,8 +21,8 @@ namespace FPSoundLib
 			return fileType switch
 			{
 				FileType.Wav => new WavFile(fileBuffer),
-				FileType.Unknown => throw new NotSupportedException("File type not known"),
-				_ => throw new NotImplementedException($"File type '{fileType.ToString().ToLower()}' not yet supported.")
+				FileType.Unknown => throw new FormatException("File type not known"),
+				_ => throw new NotSupportedException($"File type '{fileType.ToString().ToLower()}' not yet supported.")
 			};
 		}
 	}

@@ -11,19 +11,19 @@
 			  if ((punk) != NULL)  \
 				{ (punk)->Release(); (punk) = NULL; }
 
-int wasapi_wrapper::init()
+HRESULT wasapi_wrapper::init(Nullable<bool> enable_log)
 {
 	IMMDeviceEnumerator* p_enumerator = nullptr;
 
-	REFERENCE_TIME default_period;
-	REFERENCE_TIME minimum_period;
-	WAVEFORMATEX* mix_format;
 
+	if (!enable_log.HasValue)
+	{
+		enable_log = false;
+	}
 
 	// ReSharper disable CppInconsistentNaming
 	const auto CLSID_MMDeviceEnumerator = __uuidof(MMDeviceEnumerator);
 	const auto IID_IMMDeviceEnumerator = __uuidof(IMMDeviceEnumerator);
-	const auto IID_IAudioClient = __uuidof(IAudioClient);
 	// ReSharper restore CppInconsistentNaming
 
 	HRESULT hr = CoCreateInstance(
@@ -39,22 +39,17 @@ int wasapi_wrapper::init()
 
 	default_device_ = default_device;
 
-	log_device_info(default_device);
+	if (enable_log)
+	{
+		hr = log_device_info(default_device);
+		EXIT_ON_ERROR(hr, "log_device_info");
+	}
 
 	IAudioClient* audio_client = nullptr;
-	hr = default_device->Activate(IID_IAudioClient, CLSCTX_ALL, nullptr, reinterpret_cast<void**>(&audio_client));
-	EXIT_ON_ERROR(hr, "ActivateAudioDevice");
+	hr = audio_client_init(default_device, audio_client);
+	EXIT_ON_ERROR(hr, "audio_client_init");
 
 	audio_client_ = audio_client;
-
-	hr = audio_client_->GetDevicePeriod(&default_period, &minimum_period);
-	EXIT_ON_ERROR(hr, "GetDevicePeriod");
-
-	hr = audio_client_->GetMixFormat(&mix_format);
-	EXIT_ON_ERROR(hr, "GetMixFormat");
-
-	hr = audio_client_->Initialize(AUDCLNT_SHAREMODE_SHARED, 0, minimum_period, 0, mix_format, nullptr);
-	EXIT_ON_ERROR(hr, "InitializeAudioClient");
 
 	initialized = true;
 
@@ -83,7 +78,7 @@ void wasapi_wrapper::dispose()
 	initialized = false;
 }
 
-int wasapi_wrapper::log_device_info(IMMDevice* device)
+HRESULT wasapi_wrapper::log_device_info(IMMDevice* device)
 {
 	IPropertyStore* p_props = nullptr;
 	LPWSTR pwsz_id = nullptr;
@@ -108,5 +103,29 @@ int wasapi_wrapper::log_device_info(IMMDevice* device)
 	pwsz_id = nullptr;
 	auto _ = PropVariantClear(&device_name);
 	SAFE_RELEASE(p_props)
+	return 0;
+}
+
+HRESULT wasapi_wrapper::audio_client_init(IMMDevice* device, IAudioClient*& audio_client)
+{
+	// ReSharper disable once CppInconsistentNaming
+	const auto IID_IAudioClient = __uuidof(IAudioClient);
+
+	REFERENCE_TIME default_period;
+	REFERENCE_TIME minimum_period;
+	WAVEFORMATEX* mix_format;
+
+	HRESULT hr = device->Activate(IID_IAudioClient, CLSCTX_ALL, nullptr, reinterpret_cast<void**>(&audio_client));
+	EXIT_ON_ERROR(hr, "ActivateAudioDevice");
+
+	hr = audio_client->GetDevicePeriod(&default_period, &minimum_period);
+	EXIT_ON_ERROR(hr, "GetDevicePeriod");
+
+	hr = audio_client->GetMixFormat(&mix_format);
+	EXIT_ON_ERROR(hr, "GetMixFormat");
+
+	hr = audio_client->Initialize(AUDCLNT_SHAREMODE_SHARED, 0, minimum_period, 0, mix_format, nullptr);
+	EXIT_ON_ERROR(hr, "InitializeAudioClient");
+
 	return 0;
 }

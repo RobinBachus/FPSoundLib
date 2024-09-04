@@ -16,6 +16,16 @@ namespace FPSoundLib
 			if (hr != 0) 
 				throw new OperationCanceledException("Failed to initialize WASAPI, init cancelled") {HResult = hr};
 
+			renderer? renderer = wasapi_wrapper.get_renderer() ?? throw new NotSupportedException("Failed to get renderer, init cancelled") { HResult = hr };
+			
+			byte i = 0;
+			renderer.OnLoadNextChunkReady += (sender, e) =>
+			{
+				renderer.load_next_chunk(new byte[1] {++i});
+			};
+
+			renderer.start(new byte[1] { 0 });
+
 			Console.WriteLine("\nWASAPI loaded successfully.");
 		}
 

@@ -8,6 +8,8 @@
 #include <combaseapi.h>
 #include <Audioclient.h>
 
+#include "Renderer.h"
+
 #pragma comment(lib, "ole32.lib")
 #pragma comment(lib, "propsys.lib")
 #pragma comment(lib, "mmdevapi.lib")
@@ -26,6 +28,13 @@ public:
 	 */
 	static HRESULT init([Optional] Nullable<bool> enable_log);
 	static void dispose();
+
+	/**
+	 * \brief Gets a renderer object used for streaming audio
+	 * \throws InvalidOperationException if the wasapi bridge has not been initialized
+	 * \return A renderer instance
+	 */
+	static renderer^ get_renderer();
 
 	static bool initialized = false;
 

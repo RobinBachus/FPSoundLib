@@ -78,6 +78,14 @@ void wasapi_wrapper::dispose()
 	initialized = false;
 }
 
+renderer^ wasapi_wrapper::get_renderer()
+{
+	if (!initialized)
+		throw gcnew InvalidOperationException("WasapiWrapper not initialized");
+
+	return gcnew renderer(default_device_, audio_client_);
+}
+
 HRESULT wasapi_wrapper::log_device_info(IMMDevice* device)
 {
 	IPropertyStore* p_props = nullptr;

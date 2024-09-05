@@ -23,6 +23,7 @@ public:
 private:
 	IMMDevice* device_;
 	IAudioClient* audio_client_;
+	IAudioRenderClient* render_client_;
 
 	array<byte>^ current_chunk_ = gcnew array<byte>(0);
 	array<byte>^ next_chunk_ = gcnew array<byte>(0);

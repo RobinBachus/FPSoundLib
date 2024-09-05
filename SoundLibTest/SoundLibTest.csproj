@@ -9,8 +9,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="tone.mp3" />
-    <None Remove="tone.wav" />
+    <None Remove="Resources\*" />
   </ItemGroup>
 
   <ItemGroup>
@@ -18,13 +17,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="tone.wav">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-  </ItemGroup>
-
-  <ItemGroup>
-    <EmbeddedResource Include="tone.mp3">
+    <EmbeddedResource Include="Resources\*">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
   </ItemGroup>

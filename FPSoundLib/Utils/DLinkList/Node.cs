@@ -1,10 +1,10 @@
 ﻿namespace FPSoundLib.Utils.DLinkList
 {
-	internal class Node<T>(T data): IComparable<Node<T>> where T : IEquatable<T> 
+	public class Node<T>(T data): IComparable<Node<T>> 
 	{
 		public Node<T>? Next;
 		public Node<T>? Prev;
-		public T Data = data;
+		public T Value = data;
 
 		public int Index
 		{
@@ -56,10 +56,7 @@
 		/// <inheritdoc />
 		public override bool Equals(object? obj)
 		{
-			if (obj is Node<T> node)
-				return node.Data.Equals(Data);
-
-			return false;
+			return obj is Node<T> { Value: IEquatable<T> data } && data.Equals(Value);
 		}
 
 		public static bool operator ==(Node<T>? left, Node<T>? right) => left?.Equals(right) ?? right is null;

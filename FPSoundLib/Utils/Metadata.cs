@@ -17,6 +17,10 @@ namespace FPSoundLib.Utils
 		public string? Artist { get; set; } = null;
 		public string? Album { get; set; } = null;
 		public string? Genre { get; set; } = null;
+		public string? FileName { get; set; } = null;
+		public long? FileSize { get; set; } = null;
+		public string? Duration { get; set; } = null;
+		public string? FilePath { get; set; } = null;
 	}
 }
 

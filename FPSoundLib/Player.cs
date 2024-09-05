@@ -32,8 +32,9 @@ namespace FPSoundLib
 		public SoundFile LoadFromFile(string path)
 		{
 			path = Path.GetFullPath(path);
+			FileInfo fileInfo = new(path);
 
-			string ext = new FileInfo(path).Extension.Remove(0, 1);
+			string ext = fileInfo.Extension.Remove(0, 1);
 
 			_ = Enum.TryParse(ext, true, out FileType fileType);
 
@@ -42,12 +43,12 @@ namespace FPSoundLib
 			_ = file.Read(fileBuffer, 0, (int)file.Length);
 			file.Dispose();
 
-			_soundFiles.Add(SoundFile.Create(fileBuffer, fileType));
+			_soundFiles.Add(SoundFile.Create(fileBuffer, fileType, fileInfo));
 			return _soundFiles.Last();
 
 		}
 		
-		public void Dispose() => wasapi_wrapper.dispose();
+		public static void Dispose() => wasapi_wrapper.dispose();
 
 		~Player() => Dispose();
 		

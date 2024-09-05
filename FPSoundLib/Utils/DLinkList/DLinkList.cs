@@ -2,7 +2,7 @@
 
 namespace FPSoundLib.Utils.DLinkList
 {
-	internal class DLinkList<T>: ICollection<Node<T>>, IList<Node<T>> where T : IEquatable<T>
+	public class DLinkList<T>: IList<Node<T>> 
 	{
 		public Node<T>? First { get; private set; }
 		public Node<T>? Last { get; private set; }
@@ -71,7 +71,7 @@ namespace FPSoundLib.Utils.DLinkList
 			var node = First;
 			while (node != null)
 			{
-				array[arrayIndex++] = node.Data;
+				array[arrayIndex++] = node.Value;
 				node = node.Next;
 			}
 		}
@@ -160,8 +160,8 @@ namespace FPSoundLib.Utils.DLinkList
 		/// <returns>The old value of the node.</returns>
 		public T SetNode(int index, T value)
 		{
-			T oldValue = this[index].Data;
-			this[index].Data = value;
+			T oldValue = this[index].Value;
+			this[index].Value = value;
 
 			return oldValue;
 		}

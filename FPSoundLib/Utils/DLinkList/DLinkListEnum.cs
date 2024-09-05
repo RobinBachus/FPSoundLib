@@ -2,7 +2,7 @@
 
 namespace FPSoundLib.Utils.DLinkList
 {
-	internal class DLinkListEnum<T>(DLinkList<T> list) : IEnumerator<Node<T>> where T : IEquatable<T>
+	internal class DLinkListEnum<T>(DLinkList<T> list) : IEnumerator<Node<T>>
 	{
 		private int _position = -1;
 

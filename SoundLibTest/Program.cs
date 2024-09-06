@@ -12,7 +12,8 @@ namespace SoundLibTest
 				Player player = new();
 				if (player.LoadFromFile("Resources/CantinaBandCompressed.wav") is not WavFile wavFile)
 					return;
-
+				wavFile.Metadata.AddTag("sfx");
+				wavFile.Metadata.AddTag("music");
 				Console.WriteLine(wavFile);
 			}
 			catch (Exception e) when (e is NotSupportedException or FormatException or OperationCanceledException)

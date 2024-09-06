@@ -8,6 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\BachLib\BachLib.csproj" />
     <ProjectReference Include="..\WasapiWrapper\WasapiWrapper.vcxproj" />
   </ItemGroup>
 

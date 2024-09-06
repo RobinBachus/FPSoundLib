@@ -24,7 +24,7 @@ namespace FPSoundLib
 				renderer.load_next_chunk(new byte[1] {++i});
 			};
 
-			renderer.start(new byte[1] { 0 });
+			// renderer.start(new byte[1] { 0 });
 
 			Console.WriteLine("\nWASAPI loaded successfully.");
 		}

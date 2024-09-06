@@ -1,6 +1,7 @@
 ﻿using FPSoundLib.Formats;
 using FPSoundLib.Utils;
 
+
 namespace FPSoundLib
 {
 	public abstract class SoundFile(byte[] fileBuffer, FileType fileType)
@@ -43,14 +44,7 @@ namespace FPSoundLib
 		{
 			string fileName = Metadata.FileName != null ? $" ({Metadata.FileName})" : "";
 
-			string str = $"Summary of file {Id}{fileName}:\n";
-			str += "Metadata:\n";
-
-			return Metadata
-				.GetType()
-				.GetProperties()
-				.Where(property => property.GetValue(Metadata) != null)
-				.Aggregate(str, (current, property) => current + $"\t{property.Name}: {property.GetValue(Metadata)}\n");
+			return $"Summary of file {Id}{fileName}:\n{Metadata}";
 		}
 	}
 }

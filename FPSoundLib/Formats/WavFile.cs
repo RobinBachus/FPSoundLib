@@ -11,7 +11,7 @@ namespace FPSoundLib.Formats
 		// 5-8: Size of the overall file - 8 bytes, in bytes (32-bit integer).
 		public int ChunkSize { get; }
 
-		// 9-12: File Type Header. For our purposes, it always equals “WAVE”.
+		// 9-12: File Type Header. Should be "WAVE".
 		public string Format { get; }
 
 		// 13-16: Format chunk marker. Includes trailing null
@@ -47,6 +47,7 @@ namespace FPSoundLib.Formats
 		// The actual sound data.
 		public SoundData Data { get; }
 
+		// Sometimes there is an INFO chunk (LIST INFO). It usually contains metadata.
 		public InfoChunk? Info { get; }
 
 		public WavFile(byte[] fileBuffer, FileInfo? fileInfo = null) : base(fileBuffer, FileType.Wav)  
@@ -118,21 +119,3 @@ namespace FPSoundLib.Formats
 		}
 	}
 }
-
-/*
-Positions	Description
-   1-4	Marks the file as a riff file. Characters are each 1 byte long.
-   5-8	Size of the overall file - 8 bytes, in bytes (32-bit integer). Typically, you’d fill this in after creation.
-   9 -12	File Type Header. For our purposes, it always equals “WAVE”.
-   13-16	Format chunk marker. Includes trailing null
-   17-20	Length of format data as listed above
-   21-22	Type of format (1 is PCM) - 2 byte integer
-   23-24	Number of Channels - 2 byte integer
-   25-28	Sample Rate - 32 byte integer. Common values are 44100 (CD), 48000 (DAT). Sample Rate = Number of Samples per second, or Hertz.
-   29-32	(Sample Rate * BitsPerSample * Channels) / 8.
-   33-34	(BitsPerSample * Channels) / 8.1 - 8 bit mono2 - 8 bit stereo/16 bit mono4 - 16 bit stereo
-   35-36	Bits per sample
-   37-40	“data” chunk header. Marks the beginning of the data section.
-   41-44	Size of the data section.
-
- */

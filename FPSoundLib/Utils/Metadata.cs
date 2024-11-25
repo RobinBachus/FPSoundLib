@@ -2,8 +2,6 @@
 
 using static BachLib.Utils.Formatting;
 
-#pragma warning disable IDE0301 // Disable prefer simplified collection initialization
-
 namespace FPSoundLib.Utils
 {
 	/// <summary>
@@ -29,7 +27,7 @@ namespace FPSoundLib.Utils
 
 		public readonly void AddTag(string tag) => Tags.Add(tag);
 
-		public override string ToString()
+		public override readonly string ToString()
 		{
 			string str = "Metadata:\n";
 
@@ -56,5 +54,3 @@ namespace FPSoundLib.Utils
 		}
 	}
 }
-
-#pragma warning restore IDE0301

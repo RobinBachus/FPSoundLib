@@ -121,7 +121,7 @@ HRESULT wasapi_wrapper::audio_client_init(IMMDevice* device, IAudioClient*& audi
 
 	REFERENCE_TIME default_period;
 	REFERENCE_TIME minimum_period;
-	WAVEFORMATEX* mix_format;
+	WAVEFORMATEX* wave_format;
 
 	HRESULT hr = device->Activate(IID_IAudioClient, CLSCTX_ALL, nullptr, reinterpret_cast<void**>(&audio_client));
 	EXIT_ON_ERROR(hr, "ActivateAudioDevice");
@@ -129,10 +129,10 @@ HRESULT wasapi_wrapper::audio_client_init(IMMDevice* device, IAudioClient*& audi
 	hr = audio_client->GetDevicePeriod(&default_period, &minimum_period);
 	EXIT_ON_ERROR(hr, "GetDevicePeriod");
 
-	hr = audio_client->GetMixFormat(&mix_format);
+	hr = audio_client->GetMixFormat(&wave_format);
 	EXIT_ON_ERROR(hr, "GetMixFormat");
 
-	hr = audio_client->Initialize(AUDCLNT_SHAREMODE_SHARED, 0, minimum_period, 0, mix_format, nullptr);
+	hr = audio_client->Initialize(AUDCLNT_SHAREMODE_SHARED, AUDCLNT_STREAMFLAGS_EVENTCALLBACK, minimum_period, 0, wave_format, nullptr);
 	EXIT_ON_ERROR(hr, "InitializeAudioClient");
 
 	return 0;

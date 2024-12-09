@@ -1,11 +1,13 @@
-﻿using FPSoundLib.Utils;
+﻿using BachLib.Logging;
+using FPSoundLib.Utils;
 using FPSoundLib.Utils.DLinkList;
 
 namespace FPSoundLib
 {
 	public class Player
 	{
-		private readonly List<SoundFile> _soundFiles = new();
+		private readonly List<SoundFile> _soundFiles = [];
+		private static renderer? _renderer;
 
 		public Player()
 		{
@@ -18,20 +20,20 @@ namespace FPSoundLib
 				throw new OperationCanceledException("Failed to initialize WASAPI, init cancelled") { HResult = hr };
 
 			// Retrieve the renderer
-			renderer? renderer = wasapi_wrapper.get_renderer() ?? throw new NotSupportedException("Failed to get renderer, init cancelled") { HResult = hr };
+			_renderer = wasapi_wrapper.get_renderer() ?? throw new NotSupportedException("Failed to get renderer, init cancelled") { HResult = hr };
 
 			// Example of loading audio data into the renderer
 			byte i = 0;
-			renderer.OnLoadNextChunkReady += (sender, e) =>
+			_renderer.OnLoadNextChunkReady += (_, _) =>
 			{
 				// Load the next chunk of audio data
-				renderer.load_next_chunk(new byte[1] { ++i });
+				_renderer.load_next_chunk([(byte)(++i % 9 + 48)]); // ASCII 0-9
 			};
 
 			// Uncomment to start the renderer with initial data
-			// renderer.start(new byte[1] { 0 });
+			_renderer.start([0]);
 
-			Console.WriteLine("\nWASAPI loaded successfully.");
+			Logger.Log("\nWASAPI loaded successfully.");
 		}
 
 		public SoundFile LoadFromFile(string path)
@@ -52,7 +54,12 @@ namespace FPSoundLib
 			return _soundFiles.Last();
 		}
 
-		public static void Dispose() => wasapi_wrapper.dispose();
+		public static void Dispose()
+		{
+			wasapi_wrapper.dispose();
+			_renderer?.stop();
+			_renderer?.Dispose();
+		}
 
 		~Player() => Dispose();
 	}

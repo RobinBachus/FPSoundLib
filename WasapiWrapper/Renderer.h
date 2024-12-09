@@ -9,6 +9,7 @@ using namespace System;
 public ref class renderer sealed
 {
 public:
+	bool started = false;
 
 	renderer(IMMDevice* device, IAudioClient* audio_client);
 	~renderer();
@@ -26,6 +27,11 @@ private:
 	IAudioRenderClient* render_client_;
 	HANDLE render_event_;
 
+	Threading::Mutex^ mtx_;
+	Threading::AutoResetEvent^ cv_;
+
+	Threading::Thread^ render_thread_;
+
 	array<byte>^ current_chunk_ = gcnew array<byte>(0);
 	array<byte>^ next_chunk_ = gcnew array<byte>(0);
 
@@ -33,6 +39,8 @@ private:
 
 	void on_load_next_chunk_ready();
 	void render_audio_chunk(array<byte>^ chunk);
+
+	void start_thread();
 };
 
 

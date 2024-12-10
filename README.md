@@ -39,7 +39,7 @@ In this example, we create a new `Player` and load a WAV file from disk. We then
 
 <summary>Example output</summary>
 
-```
+```yml
 Summary of file AWAAYKHC (CantinaBandCompressed.wav):
 Metadata:
         Tags: sfx, music

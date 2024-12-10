@@ -18,8 +18,8 @@ renderer::renderer(IMMDevice* device, IAudioClient* audio_client)
 	render_event_ = CreateEventW(nullptr, FALSE, FALSE, nullptr);
 	if (render_event_ == nullptr)
 	{
-		const DWORD lerror = GetLastError();
-		std::cout << "Failed to create event handle: " << lerror << std::endl;
+		const DWORD l_error = GetLastError();
+		std::cout << "Failed to create event handle: " << l_error << std::endl;
 		throw gcnew InvalidOperationException("Failed to create event handle");
 	}
 

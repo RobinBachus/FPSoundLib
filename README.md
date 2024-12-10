@@ -33,12 +33,6 @@ class Program
 }
 ```
 
-In this example, we create a new `Player` and load a WAV file from disk. We then print the formatted data of the loaded file.
-
-### Note the `using` statement!
-
-I might be able to fix it at some point, but right now the gc does not like the thread running in the c++ renderer, so the program will not end untill the Player is disposed manually
-
 <details>
 
 <summary>Example output</summary>
@@ -91,6 +85,12 @@ DataChunk:
 
 ```
 </details>
+
+In this example, we create a new `Player` and load a WAV file from disk. We then print the formatted data of the loaded file.
+
+### Note the `using` statement!
+
+I might be able to fix it at some point, but right now the gc does not like the thread running in the c++ renderer, so the program will not end untill the Player is disposed manually
 
 ## Motivation
 

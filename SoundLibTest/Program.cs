@@ -1,4 +1,5 @@
-﻿using FPSoundLib;
+﻿using BachLib.Logging.Enums;
+using FPSoundLib;
 using FPSoundLib.Formats;
 
 namespace SoundLibTest
@@ -9,13 +10,12 @@ namespace SoundLibTest
 		{
 			try
 			{
-				Player? player = new();
+				using Player player = new();
 				if (player.LoadFromFile("Resources/CantinaBandCompressed.wav") is not WavFile wavFile)
 					return;
 				wavFile.Metadata.AddTag("sfx");
 				wavFile.Metadata.AddTag("music");
 				Console.WriteLine(wavFile);
-				player = null;
 			}
 			catch (Exception e) when (e is NotSupportedException or FormatException or OperationCanceledException)
 			{
@@ -23,6 +23,7 @@ namespace SoundLibTest
 				Console.WriteLine($"\n{e.GetType()}: {e.Message} (0x{e.HResult:X})");
 				Console.ResetColor();
 			}
+
 		}
 	}
 }

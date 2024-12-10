@@ -41,6 +41,7 @@ public:
 private:
 	static IMMDevice* default_device_;
 	static IAudioClient* audio_client_;
+	static bool logging_enabled_ = false;
 
 	[[nodiscard]] static HRESULT log_device_info(IMMDevice* device);
 	[[nodiscard]] static HRESULT audio_client_init(IMMDevice* device, IAudioClient*& audio_client);

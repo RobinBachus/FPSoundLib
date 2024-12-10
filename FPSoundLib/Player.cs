@@ -1,66 +1,109 @@
 ﻿using BachLib.Logging;
+using BachLib.Logging.Enums;
 using FPSoundLib.Utils;
-using FPSoundLib.Utils.DLinkList;
 
 namespace FPSoundLib
 {
-	public class Player
-	{
-		private readonly List<SoundFile> _soundFiles = [];
-		private static renderer? _renderer;
+    public class Player : IDisposable
+    {
+        private readonly List<SoundFile> _soundFiles = [];
+        private static renderer? _renderer;
+        private bool _disposed;
 
-		public Player()
-		{
-			Console.WriteLine("Loading fpsl...");
-			Console.WriteLine("Loading WASAPI... \n");
+        public static LogLevel LogLevel
+        {
+            get => Logger.Level;
+            set => Logger.Level = value;
+        }
 
-			// Initialize the WASAPI wrapper
-			int hr = wasapi_wrapper.init(true);
-			if (hr != 0)
-				throw new OperationCanceledException("Failed to initialize WASAPI, init cancelled") { HResult = hr };
+        public Player(LogLevel logLevel = LogLevel.Error)
+        {
+            Logger.Level = logLevel;
 
-			// Retrieve the renderer
-			_renderer = wasapi_wrapper.get_renderer() ?? throw new NotSupportedException("Failed to get renderer, init cancelled") { HResult = hr };
+            Logger.Log("Loading fpsl...");
+            Logger.Log("Loading WASAPI... \n", LogLevel.Debug);
 
-			// Example of loading audio data into the renderer
-			byte i = 0;
-			_renderer.OnLoadNextChunkReady += (_, _) =>
-			{
-				// Load the next chunk of audio data
-				_renderer.load_next_chunk([(byte)(++i % 9 + 48)]); // ASCII 0-9
-			};
 
-			// Uncomment to start the renderer with initial data
-			_renderer.start([0]);
+            // Initialize the WASAPI wrapper
+            int hr = wasapi_wrapper.init(LogLevel < LogLevel.Info);
+            if (hr != 0)
+                throw new OperationCanceledException("Failed to initialize WASAPI, init cancelled") { HResult = hr };
 
-			Logger.Log("\nWASAPI loaded successfully.");
-		}
+            // Retrieve the renderer
+            _renderer = wasapi_wrapper.get_renderer() ??
+                        throw new NotSupportedException("Failed to get renderer, init cancelled") { HResult = hr };
 
-		public SoundFile LoadFromFile(string path)
-		{
-			path = Path.GetFullPath(path);
-			FileInfo fileInfo = new(path);
+            // Example of loading audio data into the renderer
+            byte i = 0;
+            _renderer.OnLoadNextChunkReady += (_, _) =>
+            {
+                // Load the next chunk of audio data
+                _renderer.load_next_chunk([(byte)(++i % 9 + 48)]); // ASCII 0-9
+            };
 
-			string ext = fileInfo.Extension.Remove(0, 1);
+            // Uncomment to start the renderer with initial data
+            _renderer.start([0]);
 
-			_ = Enum.TryParse(ext, true, out FileType fileType);
+            Logger.Log("\nWASAPI loaded successfully.");
+        }
 
-			FileStream file = File.OpenRead(path);
-			byte[] fileBuffer = new byte[file.Length];
-			_ = file.Read(fileBuffer, 0, (int)file.Length);
-			file.Dispose();
+        public SoundFile LoadFromFile(string path)
+        {
+            path = Path.GetFullPath(path);
+            FileInfo fileInfo = new(path);
 
-			_soundFiles.Add(SoundFile.Create(fileBuffer, fileType, fileInfo));
-			return _soundFiles.Last();
-		}
+            string ext = fileInfo.Extension.Remove(0, 1);
 
-		public static void Dispose()
-		{
-			wasapi_wrapper.dispose();
-			_renderer?.stop();
-			_renderer?.Dispose();
-		}
+            // TODO: Handle parsing errors
+            _ = Enum.TryParse(ext, true, out FileType fileType);
 
-		~Player() => Dispose();
-	}
+            using FileStream file = File.OpenRead(path);
+            byte[] fileBuffer = new byte[file.Length];
+
+            // TODO: Handle file reading errors
+            _ = file.Read(fileBuffer, 0, (int)file.Length);
+
+            _soundFiles.Add(SoundFile.Create(fileBuffer, fileType, fileInfo));
+            return _soundFiles.Last();
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (_disposed)
+                return;
+
+            if (disposing)
+            {
+                // Dispose managed resources
+                _soundFiles.Clear();
+            }
+
+            // Dispose unmanaged resources
+            if (_renderer != null)
+            {
+                _renderer.stop();
+                _renderer.Dispose();
+                _renderer = null;
+            }
+
+            wasapi_wrapper.dispose();
+
+            _disposed = true;
+        }
+
+        ~Player()
+        {
+            if (_disposed)
+                return;
+
+            Logger.Log("Warning: Player was not disposed properly.", LogLevel.Warn);
+            Dispose(false);
+        }
+    }
 }

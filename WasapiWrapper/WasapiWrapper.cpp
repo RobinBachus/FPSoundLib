@@ -11,6 +11,10 @@
 			  if ((punk) != NULL)  \
 				{ (punk)->Release(); (punk) = NULL; }
 
+#define LOG(message) \
+	if (logging_enabled_)\
+		std::cout << message << std::endl;
+
 HRESULT wasapi_wrapper::init(Nullable<bool> enable_log)
 {
 	IMMDeviceEnumerator* p_enumerator = nullptr;
@@ -18,7 +22,7 @@ HRESULT wasapi_wrapper::init(Nullable<bool> enable_log)
 
 	if (!enable_log.HasValue)
 	{
-		enable_log = false;
+		logging_enabled_ = enable_log.Value;
 	}
 
 	// ReSharper disable CppInconsistentNaming
@@ -39,7 +43,7 @@ HRESULT wasapi_wrapper::init(Nullable<bool> enable_log)
 
 	default_device_ = default_device;
 
-	if (enable_log)
+	if (logging_enabled_)
 	{
 		hr = log_device_info(default_device);
 		EXIT_ON_ERROR(hr, "log_device_info");
@@ -60,21 +64,21 @@ void wasapi_wrapper::dispose()
 {
 	if (!initialized) return;
 
-	std::cout << "Disposing WasapiWrapper..." << std::endl;
+	LOG("Disposing WasapiWrapper...");
 
 	if (default_device_ != nullptr)
 	{
-		std::cout << "Releasing default device" << std::endl;
+		LOG("Releasing default device");
 		SAFE_RELEASE(default_device_);
 	}
 
 	if (audio_client_ != nullptr)
 	{
-		std::cout << "Releasing audio client" << std::endl;
+		LOG("Releasing audio client");
 		SAFE_RELEASE(audio_client_);
 	}
 
-	std::cout << "WasapiWrapper disposed" << std::endl;
+	LOG("WasapiWrapper disposed");
 	initialized = false;
 }
 
@@ -106,7 +110,6 @@ HRESULT wasapi_wrapper::log_device_info(IMMDevice* device)
 	std::wcout << "Endpoint ID: " << pwsz_id << std::endl;
 	std::wcout << "Endpoint name: " << device_name.pwszVal << std::endl;
 
-
 	CoTaskMemFree(pwsz_id);
 	pwsz_id = nullptr;
 	auto _ = PropVariantClear(&device_name);
@@ -132,7 +135,8 @@ HRESULT wasapi_wrapper::audio_client_init(IMMDevice* device, IAudioClient*& audi
 	hr = audio_client->GetMixFormat(&wave_format);
 	EXIT_ON_ERROR(hr, "GetMixFormat");
 
-	hr = audio_client->Initialize(AUDCLNT_SHAREMODE_SHARED, AUDCLNT_STREAMFLAGS_EVENTCALLBACK, minimum_period, 0, wave_format, nullptr);
+	hr = audio_client->Initialize(AUDCLNT_SHAREMODE_SHARED, AUDCLNT_STREAMFLAGS_EVENTCALLBACK, minimum_period, 0,
+	                              wave_format, nullptr);
 	EXIT_ON_ERROR(hr, "InitializeAudioClient");
 
 	return 0;

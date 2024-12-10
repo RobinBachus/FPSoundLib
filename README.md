@@ -91,3 +91,9 @@ DataChunk:
 
 ```
 </details>
+
+## Motivation
+
+While making my C# practice project, [Floppy Plane](https://github.com/RobinBachus/Floppy-Plane-WPF), I was surprised that WPF has very limited audio capabilities.  
+I wanted to play audio files in the background of my game, but often ran into issues when I wanted to play more than one sound at a time.  
+I don't know how I did not find NAudio at that time. But it felt like an interesting topic, and I've been wanting to learn c++ for a while now, so I decided to make my own audio library.

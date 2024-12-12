@@ -10,7 +10,7 @@ namespace SoundLibTest
 		{
 			try
 			{
-				using Player player = new();
+				using Player player = new(LogLevel.Debug);
 				if (player.LoadFromFile("Resources/CantinaBandCompressed.wav") is not WavFile wavFile)
 					return;
 				wavFile.Metadata.AddTag("sfx");

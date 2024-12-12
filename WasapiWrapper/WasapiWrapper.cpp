@@ -20,10 +20,9 @@ HRESULT wasapi_wrapper::init(Nullable<bool> enable_log)
 	IMMDeviceEnumerator* p_enumerator = nullptr;
 
 
-	if (!enable_log.HasValue)
-	{
+	if (enable_log.HasValue)
 		logging_enabled_ = enable_log.Value;
-	}
+	
 
 	// ReSharper disable CppInconsistentNaming
 	const auto CLSID_MMDeviceEnumerator = __uuidof(MMDeviceEnumerator);

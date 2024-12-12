@@ -140,7 +140,7 @@ void renderer::start_thread()
 
 			if (current_chunk_->Length != 0)
 			{
-				std::cout << current_chunk_[0] << std::endl;
+				std::cout << std::dec << current_chunk_[0] << std::endl;
 				on_load_next_chunk_ready();
 				Sleep(500);
 			}

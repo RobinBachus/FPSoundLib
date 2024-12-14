@@ -19,6 +19,8 @@ namespace SoundLibTest
 				Console.WriteLine(wavFile);
 				// Testing the renderer thread
 				Thread.Sleep(1000);
+				Player.Play(wavFile);
+				Thread.Sleep(10000);
 			}
 			catch (Exception e) when (e is NotSupportedException or FormatException or OperationCanceledException)
 			{

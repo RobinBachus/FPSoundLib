@@ -14,7 +14,7 @@ public:
 	renderer(IMMDevice* device, IAudioClient* audio_client);
 	~renderer();
 
-	void start(array<byte>^ entry_chunk);
+	void start();
 	void stop();
 
 	void load_next_chunk(array<byte>^ chunk);

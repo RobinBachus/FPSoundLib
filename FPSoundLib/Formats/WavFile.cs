@@ -45,7 +45,7 @@ namespace FPSoundLib.Formats
 		public int DataSize { get; }
 
 		// The actual sound data.
-		public SoundData Data { get; }
+		public override SoundData Data { get; }
 
 		// Sometimes there is an INFO chunk (LIST INFO). It usually contains metadata.
 		public InfoChunk? Info { get; }

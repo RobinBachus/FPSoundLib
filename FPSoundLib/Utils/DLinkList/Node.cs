@@ -63,6 +63,10 @@
 
 		public static bool operator !=(Node<T>? left, Node<T>? right) => !(left == right);
 
+		public static Node<T>? operator ++(Node<T> node) => node.Next;
+
+		public static Node<T>? operator --(Node<T> node) => node.Prev;
+
 		/// <inheritdoc />
 		public override int GetHashCode() => default;
 	}

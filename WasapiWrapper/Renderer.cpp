@@ -59,7 +59,7 @@ renderer::~renderer()
 	}
 }
 
-void renderer::start(array<byte>^ entry_chunk)
+void renderer::start()
 {
 	render_thread_ = gcnew Threading::Thread(gcnew Threading::ThreadStart(this, &renderer::start_thread));
 	render_thread_->Name = "renderer";
@@ -67,20 +67,18 @@ void renderer::start(array<byte>^ entry_chunk)
 
 	started = true;
 
-	HRESULT hr = audio_client_->Start();
-	if (FAILED(hr))
+	if (FAILED(audio_client_->Start()))
 	{
 		throw gcnew InvalidOperationException("Failed to start audio client");
 	}
 
-	load_next_chunk(entry_chunk);
+	
 }
 
 void renderer::stop()
 {
 	started = false;
-	const HRESULT hr = audio_client_->Stop();
-	if (FAILED(hr))
+	if (FAILED(audio_client_->Stop()))
 	{
 		throw gcnew InvalidOperationException("Failed to stop audio client");
 	}
@@ -140,7 +138,7 @@ void renderer::start_thread()
 
 			if (current_chunk_->Length != 0)
 			{
-				std::cout << std::dec << current_chunk_[0] << std::endl;
+				std::wcout << std::hex << current_chunk_[0] << " " << std::hex << current_chunk_[1] << std::endl;
 				on_load_next_chunk_ready();
 				Sleep(500);
 			}

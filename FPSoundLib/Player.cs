@@ -30,19 +30,11 @@ namespace FPSoundLib
 				throw new OperationCanceledException("Failed to initialize WASAPI, init cancelled") { HResult = hr };
 
 			// Retrieve the renderer
-			_renderer = wasapi_wrapper.get_renderer() ??
-						throw new NotSupportedException("Failed to get renderer, init cancelled") { HResult = hr };
-
-			// Example of loading audio data into the renderer
-			byte i = 0;
-			_renderer.OnLoadNextChunkReady += (_, _) =>
-			{
-				// Load the next chunk of audio data
-				_renderer.load_next_chunk([(byte)(++i % 9 + 48)]); // ASCII 0-9
-			};
+			_renderer ??= wasapi_wrapper.get_renderer() ??
+						  throw new NotSupportedException("Failed to get renderer, init cancelled") { HResult = hr };
 
 			// Uncomment to start the renderer with initial data
-			_renderer.start([0]);
+			//_renderer.start();
 
 			Logger.Log("\nWASAPI loaded successfully.", LogLevel.Debug);
 			Logger.Log("FPSoundLib loaded successfully.");
@@ -66,6 +58,31 @@ namespace FPSoundLib
 
 			_soundFiles.Add(SoundFile.Create(fileBuffer, fileType, fileInfo));
 			return _soundFiles.Last();
+		}
+
+		public static void Play(SoundFile file)
+		{
+			if (_renderer == null)
+				throw new Exception("Tried to play a sound file, but the renderer is null");
+
+			if (!_renderer.started)
+				_renderer.start();
+
+			var node = file.Data.Samples.First;
+
+			if (node == null)
+				throw new Exception("Tried to play a sound file without any samples");
+
+			EventHandler? loadChunk = null;
+			loadChunk = (sender, e) =>
+			{
+				_renderer.load_next_chunk((++node)?.Value ?? []);
+				if (node == null)
+					_renderer.OnLoadNextChunkReady -= loadChunk;
+			};
+
+			_renderer.OnLoadNextChunkReady += loadChunk;
+			_renderer.load_next_chunk(node.Value);
 		}
 
 		public void Dispose()

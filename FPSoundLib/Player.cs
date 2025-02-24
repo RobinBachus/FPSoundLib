@@ -1,127 +1,129 @@
 ﻿using BachLib.Logging;
 using BachLib.Logging.Enums;
 using FPSoundLib.Utils;
+using FPSoundLib.Utils.DLinkList;
 
 namespace FPSoundLib
 {
-	public class Player : IDisposable
-	{
-		private readonly List<SoundFile> _soundFiles = [];
-		private static renderer? _renderer;
-		private bool _disposed;
+    public class Player : IDisposable
+    {
+        private readonly List<SoundFile> _soundFiles = [];
+        private static renderer? _renderer;
+        private bool _disposed;
 
-		public static LogLevel LogLevel
-		{
-			get => Logger.Level;
-			set => Logger.Level = value;
-		}
+        public static LogLevel LogLevel
+        {
+            get => Logger.Level;
+            set => Logger.Level = value;
+        }
 
-		public Player(LogLevel logLevel = LogLevel.Error)
-		{
-			Logger.Level = logLevel;
+        public Player(LogLevel logLevel = LogLevel.Error)
+        {
+            Logger.Level = logLevel;
 
-			Logger.Log("Loading fpsl...");
-			Logger.Log("Loading WASAPI... \n", LogLevel.Debug);
+            Logger.Log("Loading fpsl...");
+            Logger.Log("Loading WASAPI... \n", LogLevel.Debug);
 
 
-			// Initialize the WASAPI wrapper
-			int hr = wasapi_wrapper.init(LogLevel < LogLevel.Info);
-			if (hr != 0)
-				throw new OperationCanceledException("Failed to initialize WASAPI, init cancelled") { HResult = hr };
+            // Initialize the WASAPI wrapper
+            int hr = wasapi_wrapper.init(LogLevel < LogLevel.Info);
+            if (hr != 0)
+                throw new OperationCanceledException("Failed to initialize WASAPI, init cancelled") { HResult = hr };
 
-			// Retrieve the renderer
-			_renderer ??= wasapi_wrapper.get_renderer() ??
-						  throw new NotSupportedException("Failed to get renderer, init cancelled") { HResult = hr };
+            // Retrieve the renderer
+            _renderer ??= wasapi_wrapper.get_renderer() ??
+                          throw new NotSupportedException("Failed to get renderer, init cancelled") { HResult = hr };
 
-			// Uncomment to start the renderer with initial data
-			//_renderer.start();
+            Logger.Log("\nWASAPI loaded successfully.", LogLevel.Debug);
+            Logger.Log("FPSoundLib loaded successfully.");
+        }
 
-			Logger.Log("\nWASAPI loaded successfully.", LogLevel.Debug);
-			Logger.Log("FPSoundLib loaded successfully.");
-		}
+        public SoundFile LoadFromFile(string path)
+        {
+            path = Path.GetFullPath(path);
+            FileInfo fileInfo = new(path);
 
-		public SoundFile LoadFromFile(string path)
-		{
-			path = Path.GetFullPath(path);
-			FileInfo fileInfo = new(path);
+            string ext = fileInfo.Extension.Remove(0, 1);
 
-			string ext = fileInfo.Extension.Remove(0, 1);
+            // TODO: Handle parsing errors
+            _ = Enum.TryParse(ext, true, out FileType fileType);
 
-			// TODO: Handle parsing errors
-			_ = Enum.TryParse(ext, true, out FileType fileType);
+            using FileStream file = File.OpenRead(path);
+            byte[] fileBuffer = new byte[file.Length];
 
-			using FileStream file = File.OpenRead(path);
-			byte[] fileBuffer = new byte[file.Length];
+            // TODO: Handle file reading errors
+            _ = file.Read(fileBuffer, 0, (int)file.Length);
 
-			// TODO: Handle file reading errors
-			_ = file.Read(fileBuffer, 0, (int)file.Length);
+            _soundFiles.Add(SoundFile.Create(fileBuffer, fileType, fileInfo));
+            return _soundFiles.Last();
+        }
 
-			_soundFiles.Add(SoundFile.Create(fileBuffer, fileType, fileInfo));
-			return _soundFiles.Last();
-		}
+        public static void Play(SoundFile file)
+        {
+            if (_renderer == null)
+                throw new Exception("Tried to play a sound file, but the renderer is null");
 
-		public static void Play(SoundFile file)
-		{
-			if (_renderer == null)
-				throw new Exception("Tried to play a sound file, but the renderer is null");
+            if (!_renderer.started)
+                _renderer.start();
 
-			if (!_renderer.started)
-				_renderer.start();
+            Node<byte[]>? node = file.Data.Samples.First ??
+                                 throw new Exception("Tried to play a sound file without any samples");
 
-			var node = file.Data.Samples.First;
+            _renderer.OnLoadNextChunkReady += LoadChunk;
+            _renderer.load_next_chunk(node.Value);
+            return;
 
-			if (node == null)
-				throw new Exception("Tried to play a sound file without any samples");
+            // I feel like this can be simplified, but I'm too tired to think about it right now
+            void LoadChunk(object? o, EventArgs eventArgs)
+            {
+                if (node == null || _renderer == null)
+                    return;
 
-			EventHandler? loadChunk = null;
-			loadChunk = (sender, e) =>
-			{
-				_renderer.load_next_chunk((++node)?.Value ?? []);
-				if (node == null)
-					_renderer.OnLoadNextChunkReady -= loadChunk;
-			};
+                node = node.Next;
 
-			_renderer.OnLoadNextChunkReady += loadChunk;
-			_renderer.load_next_chunk(node.Value);
-		}
+                if (node == null)
+                    _renderer.OnLoadNextChunkReady -= LoadChunk;
+                else _renderer.load_next_chunk(node.Value);
+            }
+        }
 
-		public void Dispose()
-		{
-			Dispose(true);
-			GC.SuppressFinalize(this);
-		}
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
 
-		protected virtual void Dispose(bool disposing)
-		{
-			if (_disposed)
-				return;
+        protected virtual void Dispose(bool disposing)
+        {
+            if (_disposed)
+                return;
 
-			if (disposing)
-			{
-				// Dispose managed resources
-				_soundFiles.Clear();
-			}
+            if (disposing)
+            {
+                // Dispose managed resources
+                _soundFiles.Clear();
+            }
 
-			// Dispose unmanaged resources
-			if (_renderer != null)
-			{
-				_renderer.stop();
-				_renderer.Dispose();
-				_renderer = null;
-			}
+            // Dispose unmanaged resources
+            if (_renderer != null)
+            {
+                _renderer.stop();
+                _renderer.Dispose();
+                _renderer = null;
+            }
 
-			wasapi_wrapper.dispose();
+            wasapi_wrapper.dispose();
 
-			_disposed = true;
-		}
+            _disposed = true;
+        }
 
-		~Player()
-		{
-			if (_disposed)
-				return;
+        ~Player()
+        {
+            if (_disposed)
+                return;
 
-			Logger.Log("Player was not disposed properly.", LogLevel.Warn);
-			Dispose(false);
-		}
-	}
+            Logger.Log("Player was not disposed properly.", LogLevel.Warn);
+            Dispose(false);
+        }
+    }
 }

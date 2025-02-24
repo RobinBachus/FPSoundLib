@@ -39,7 +39,7 @@ namespace FPSoundLib.Utils
 			string str = "";
 
 			int i = 0;
-			foreach (var sample in Samples)
+			foreach (Node<byte[]> sample in Samples)
 			{
 				if (i >= (16 * 20)) 
 					return $"{str}..."; 
@@ -55,7 +55,7 @@ namespace FPSoundLib.Utils
 		public void PrintSamples(CancellationToken? token = null)
 		{
 			int i = 0;
-			foreach (var sample in Samples)
+			foreach (Node<byte[]> sample in Samples)
 			{
 				if (token?.IsCancellationRequested ?? false)
 					break;

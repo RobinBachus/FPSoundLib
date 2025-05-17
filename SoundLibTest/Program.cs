@@ -19,21 +19,6 @@ namespace SoundLibTest
 				wavFile.Metadata.AddTag("music");
 				Console.WriteLine(wavFile);
 
-				Dictionary<byte, int> byteCount = new();
-				foreach (Node<byte[]> b in wavFile.Data.Samples)
-				{
-					foreach (byte bb in b.Value)
-					{
-						if (!byteCount.TryAdd(bb, 1))
-							byteCount[bb]++;
-					}
-				}
-
-				foreach (KeyValuePair<byte, int> kvp in byteCount)
-				{
-					Console.WriteLine($"{kvp.Key:X}; {kvp.Value}");
-				}
-
 				// Testing the renderer thread
 				Thread.Sleep(1000);
 				Player.Play(wavFile);

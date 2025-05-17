@@ -11,7 +11,7 @@
 			get
 			{
 				int i = 0;
-				var node = this;
+				Node<T>? node = this;
 				while (node.Prev != null)
 				{
 					node = node.Prev;

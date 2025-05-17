@@ -21,18 +21,14 @@ namespace FPSoundLib.Utils.DLinkList
 
 		/// <inheritdoc />
 		public void Add(Node<T> node)
-		{
-			if (First == null)
-			{
+        {
+            if (First == null)
 				First = node;
-				Last = node;
-			}
 			else
-			{
 				node.AddAfterNode(Last!);
-				Last = node;
-			}
-		}
+            
+            Last = node;
+        }
 
 		/// <inheritdoc cref="Add(Node{T})"/>
 		/// <param name="item">The item to add to the list.</param>
@@ -42,7 +38,7 @@ namespace FPSoundLib.Utils.DLinkList
 		/// <inheritdoc />
 		public void Clear()
 		{
-			foreach (var node in this)
+			foreach (Node<T> node in this)
 			{
 				node.Remove();
 			}
@@ -58,7 +54,7 @@ namespace FPSoundLib.Utils.DLinkList
 		/// <inheritdoc />
 		public void CopyTo(Node<T>[] array, int arrayIndex)
 		{
-			var node = First;
+			Node<T>? node = First;
 			while (node != null)
 			{
 				array[arrayIndex++] = node;
@@ -68,7 +64,7 @@ namespace FPSoundLib.Utils.DLinkList
 
 		public void CopyTo(T[] array, int arrayIndex)
 		{
-			var node = First;
+			Node<T>? node = First;
 			while (node != null)
 			{
 				array[arrayIndex++] = node.Value;
@@ -91,7 +87,7 @@ namespace FPSoundLib.Utils.DLinkList
 		/// <inheritdoc />
 		public int IndexOf(Node<T> item)
 		{
-			foreach (var node in this)
+			foreach (Node<T> node in this)
 			{
 				if (node.Equals(item))
 					return node.Index;
@@ -134,7 +130,7 @@ namespace FPSoundLib.Utils.DLinkList
 				if (index < 0 || index >= Count)
 					throw new IndexOutOfRangeException();
 
-				foreach (var node in this)
+				foreach (Node<T> node in this)
 					if (node.Index == index) 
 						return node;
 
@@ -142,7 +138,7 @@ namespace FPSoundLib.Utils.DLinkList
 			}
 			set
 			{
-				var node = value.AddBeforeNode(this[index]);
+				Node<T> node = value.AddBeforeNode(this[index]);
 				node.Next!.Remove();
 
 				if (index == 0)

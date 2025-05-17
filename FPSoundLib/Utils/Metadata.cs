@@ -27,7 +27,7 @@ namespace FPSoundLib.Utils
 
 		public readonly void AddTag(string tag) => Tags.Add(tag);
 
-		public override readonly string ToString()
+		public override string ToString()
 		{
 			string str = "Metadata:\n";
 

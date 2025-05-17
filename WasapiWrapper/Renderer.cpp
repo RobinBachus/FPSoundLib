@@ -2,7 +2,6 @@
 #include "Renderer.h"
 
 #include <iostream>
-#include <ostream>
 
 #define EXIT_ON_ERROR(hr, message)  \
 	if (FAILED(hr)) { \
@@ -84,6 +83,7 @@ void renderer::stop()
 	}
 }
 
+// TODO: Pass metadata here
 void renderer::load_next_chunk(array<byte>^ chunk)
 {
 	mtx_->WaitOne();
@@ -125,6 +125,8 @@ void renderer::render_audio_chunk(array<byte>^ chunk)
 	}
 }
 
+
+// TODO: Move thread to Bridge or separate class
 void renderer::start_thread()
 {
 	while (started)
@@ -138,9 +140,20 @@ void renderer::start_thread()
 
 			if (current_chunk_->Length != 0)
 			{
-				std::wcout << std::hex << current_chunk_[0] << " " << std::hex << current_chunk_[1] << std::endl;
+				// TODO: Use metadata to determine how to parse data: 8-bit mono, 8-bit stereo, 16-bit mono, 16-bit stereo
+				// See load_next_chunk TODO.
+				// Metadata needed: bits per sample, channels, block align, sample rate
+
+				// This only works for 16-bit mono data (out of bounds with 8 mono)
+				for (int i = 0; i < current_chunk_->Length; i += 2)
+				{
+					// Parse PCM data (little endian)
+					const int16_t sample = static_cast<int16_t>((current_chunk_[i + 1] << 8) | current_chunk_[i]);
+					std::wcout << sample << std::endl;
+				}
+
 				on_load_next_chunk_ready();
-				Sleep(500);
+				Sleep(50);
 			}
 		}
 		else

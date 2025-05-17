@@ -44,7 +44,7 @@ namespace FPSoundLib.Utils
 				if (i >= (16 * 20)) 
 					return $"{str}..."; 
 
-				str = sample.Value.Aggregate(str, (current, b) => current + $"{b:X2} ");
+				str = sample.Value.Aggregate(str, (current, b) => $"{current} {b:X2} ");
 				
 				str += ++i % 16 == 0 ? "\n" : " ";
 			}
